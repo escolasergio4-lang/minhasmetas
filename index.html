@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metas & Horizontes 2025</title>
+    <meta name="description" content="Gerenciador de resoluções de ano novo focado em produtividade e clareza.">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <header class="bg-blue-600 text-white p-6 shadow-lg sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold">Metas & Horizontes</h1>
+                <p class="text-blue-100 text-sm">Trace seu caminho para 2025</p>
+            </div>
+            <button id="installBtn" class="hidden bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow hover:bg-gray-100 transition">
+                Instalar App
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 pb-24">
+        
+        <div class="bg-white rounded-xl shadow-md p-5 mb-6 border-l-4 border-blue-500">
+            <h2 class="text-lg font-semibold mb-3 text-gray-700">Nova Resolução</h2>
+            <div class="flex gap-2">
+                <input type="text" id="goalInput" placeholder="Ex: Escrever 2 páginas do livro por dia..." 
+                    class="w-full border-gray-300 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                <button onclick="addGoal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition shadow">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="goalsList" class="space-y-3">
+            </div>
+
+        <div id="emptyState" class="text-center py-10 hidden">
+            <i class="fas fa-seedling text-4xl text-gray-300 mb-3"></i>
+            <p class="text-gray-500">Nenhuma meta ainda. Que tal começar agora?</p>
+        </div>
+    </main>
+
+    <script>
+        // 1. Carregar metas salvas
+        let goals = JSON.parse(localStorage.getItem('myGoals')) || [];
+
+        function renderGoals() {
+            const list = document.getElementById('goalsList');
+            const empty = document.getElementById('emptyState');
+            list.innerHTML = '';
+
+            if (goals.length === 0) {
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                goals.forEach((goal, index) => {
+                    const completedClass = goal.done ? 'bg-blue-50 border-blue-200' : 'bg-white';
+                    const textClass = goal.done ? 'line-through text-gray-400' : 'text-gray-800';
+                    const iconClass = goal.done ? 'fa-check-circle text-blue-600' : 'fa-circle text-gray-300';
+
+                    const html = `
+                        <div class="fade-in ${completedClass} p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between transition-all hover:shadow-md">
+                            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleGoal(${index})">
+                                <i class="far ${iconClass} text-xl transition-colors"></i>
+                                <span class="${textClass} font-medium">${goal.text}</span>
+                            </div>
+                            <button onclick="deleteGoal(${index})" class="text-gray-300 hover:text-red-500 transition p-2">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    `;
+                    list.innerHTML += html;
+                });
+            }
+        }
+
+        function addGoal() {
+            const input = document.getElementById('goalInput');
+            const text = input.value.trim();
+            if (text) {
+                goals.unshift({ text: text, done: false }); // Adiciona no topo
+                saveAndRender();
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function toggleGoal(index) {
+            goals[index].done = !goals[index].done;
+            saveAndRender();
+        }
+
+        function deleteGoal(index) {
+            if(confirm('Deseja remover esta meta da história?')) {
+                goals.splice(index, 1);
+                saveAndRender();
+            }
+        }
+
+        function saveAndRender() {
+            localStorage.setItem('myGoals', JSON.stringify(goals));
+            renderGoals();
+        }
+
+        // Inicializar
+        renderGoals();
+
+        // 2. Lógica do PWA (Service Worker)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker Registrado'));
+        }
+
+        // Botão de Instalação
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const btn = document.getElementById('installBtn');
+            btn.classList.remove('hidden');
+            
+            btn.addEventListener('click', () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        btn.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
