@@ -61,7 +61,7 @@
         .bg-bright { background-color: #00ABE4; }
         
         /* Modal Backdrop */
-        #nameModal { backdrop-filter: blur(8px); background-color: rgba(0,0,0, 0.5); }
+        #nameModal { backdrop-filter: blur(8px); background-color: rgba(0,0,0, 0.6); }
 
         /* Barra Listrada Animada */
         .progress-striped {
@@ -74,16 +74,7 @@
 </head>
 <body class="bg-bgLight text-slate-700 dark:bg-bgDark dark:text-slate-200">
 
-    <button onclick="toggleTheme()" class="fixed top-6 right-6 z-50 bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg text-white hover:bg-white/30 transition border border-white/20">
-        <i id="themeIcon" class="fas fa-moon text-lg"></i>
-    </button>
-
-    <button id="installBtn" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white dark:bg-cardDark text-bright px-6 py-4 rounded-full shadow-2xl z-50 font-bold flex items-center gap-3 border border-blue-100 dark:border-slate-700 hover:scale-105 transition pulse-soft">
-        <i class="fas fa-download bg-blue-50 dark:bg-slate-900 p-2 rounded-full"></i> 
-        <span>Instalar App</span>
-    </button>
-
-    <div id="nameModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6">
+    <div id="nameModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center p-6">
         <div class="bg-white dark:bg-cardDark rounded-[2rem] shadow-2xl p-8 w-full max-w-sm text-center slide-up border border-[#E9F1FA] dark:border-slate-600">
             <div class="w-16 h-16 bg-[#E9F1FA] dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-5">
                 <i class="fas fa-user-astronaut text-bright text-2xl"></i>
@@ -94,6 +85,15 @@
             <button onclick="saveName()" class="w-full bg-bright text-white font-bold py-3 rounded-xl shadow-lg hover:brightness-110 transition transform active:scale-95">Iniciar</button>
         </div>
     </div>
+
+    <button onclick="toggleTheme()" class="fixed top-6 right-6 z-50 bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg text-white hover:bg-white/30 transition border border-white/20">
+        <i id="themeIcon" class="fas fa-moon text-lg"></i>
+    </button>
+
+    <button id="installBtn" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white dark:bg-cardDark text-bright px-6 py-4 rounded-full shadow-2xl z-50 font-bold flex items-center gap-3 border border-blue-100 dark:border-slate-700 hover:scale-105 transition pulse-soft">
+        <i class="fas fa-download bg-blue-50 dark:bg-slate-900 p-2 rounded-full"></i> 
+        <span>Instalar App</span>
+    </button>
 
     <header class="bg-bright text-white pt-8 pb-12 px-6 rounded-b-[3rem] shadow-lg relative overflow-hidden transition-colors">
         <div class="max-w-md mx-auto relative z-10 flex justify-between items-end">
@@ -151,7 +151,7 @@
     <div id="floatContainer" class="fixed inset-0 pointer-events-none z-50"></div>
 
     <script>
-        // --- Lógica de Tema (Dark/Light) ---
+        // --- Lógica de Tema ---
         function toggleTheme() {
             const html = document.documentElement;
             const icon = document.getElementById('themeIcon');
@@ -167,7 +167,6 @@
             }
         }
 
-        // Carregar tema salvo
         if (localStorage.getItem('theme') === 'dark' || 
            (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
@@ -207,7 +206,9 @@
             tempSteps: 3
         };
 
+        // --- Inicialização ---
         function init() {
+            // Verifica se tem nome. Se não tiver, mostra o modal.
             if (!state.name) {
                 document.getElementById('nameModal').classList.remove('hidden');
             } else {
@@ -293,7 +294,6 @@
 
         function getStatus(current, total) {
             const pct = (current / total) * 100;
-            // Cores ajustadas para Dark Mode também
             if (pct === 0) return { text: "Ponto de Partida", color: "text-gray-500 dark:text-gray-400" };
             if (pct < 35) return { text: "Ganhando Impulso", color: "text-[#00ABE4]" };
             if (pct < 70) return { text: "Ritmo Forte", color: "text-blue-600 dark:text-blue-400" };
@@ -331,7 +331,6 @@
                     const isDone = goal.done;
 
                     const item = document.createElement('div');
-                    // Classes dinâmicas para Dark Mode nos cards
                     item.className = `pop-in bg-white dark:bg-cardDark rounded-[1.5rem] p-5 shadow-sm dark:shadow-black/20 border border-transparent transition-all duration-300 relative overflow-hidden ${isDone ? 'opacity-60 grayscale-[0.5] bg-gray-100 dark:bg-slate-900' : 'hover:shadow-md hover:border-blue-100 dark:hover:border-slate-600'}`;
                     
                     const btnHtml = isDone 
