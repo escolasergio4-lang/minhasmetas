@@ -3,145 +3,318 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Metas & Horizontes 2025</title>
-    <meta name="description" content="Gerenciador de resoluções de ano novo focado em produtividade e clareza.">
-    <meta name="theme-color" content="#2563eb">
+    <title>Metas 2026</title>
+    <meta name="theme-color" content="#00ABE4">
     <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Paleta Definida */
+        :root {
+            --bg-light: #E9F1FA;
+            --blue-bright: #00ABE4;
+            --white: #FFFFFF;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--bg-light); 
+            color: #334155; 
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        /* Animações */
+        .pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .slide-up { animation: slideUp 0.5s ease-out; }
+        .float-text { animation: floatUpFade 1.2s ease-out forwards; }
+
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes floatUpFade {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-30px) scale(1.1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1); opacity: 0; }
+        }
+
+        /* Utilitários Visuais */
+        .text-bright { color: var(--blue-bright); }
+        .bg-bright { background-color: var(--blue-bright); }
+        .border-bright { border-color: var(--blue-bright); }
+        
+        /* Modal Backdrop */
+        #nameModal { backdrop-filter: blur(8px); background-color: rgba(233, 241, 250, 0.8); }
+
+        /* Barra Listrada Animada (Efeito de progresso ativo) */
+        .progress-striped {
+            background-image: linear-gradient(45deg,rgba(255,255,255,.2) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.2) 50%,rgba(255,255,255,.2) 75%,transparent 75%,transparent);
+            background-size: 1rem 1rem;
+            animation: progress-bar-stripes 1s linear infinite;
+        }
+        @keyframes progress-bar-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="pb-32">
 
-    <header class="bg-blue-600 text-white p-6 shadow-lg sticky top-0 z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold">Metas & Horizontes</h1>
-                <p class="text-blue-100 text-sm">Trace seu caminho para 2025</p>
+    <div id="nameModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6">
+        <div class="bg-white rounded-[2rem] shadow-2xl p-8 w-full max-w-sm text-center slide-up border border-[#E9F1FA]">
+            <div class="w-16 h-16 bg-[#E9F1FA] rounded-full flex items-center justify-center mx-auto mb-5">
+                <i class="fas fa-user-astronaut text-[#00ABE4] text-2xl"></i>
             </div>
-            <button id="installBtn" class="hidden bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow hover:bg-gray-100 transition">
-                Instalar App
-            </button>
+            <h2 class="text-2xl font-bold text-gray-700 mb-2">Jornada 2026</h2>
+            <p class="text-gray-400 mb-6">Quem é o autor desta história?</p>
+            <input type="text" id="nameInput" placeholder="Seu nome" class="w-full bg-[#E9F1FA] rounded-xl px-4 py-3 text-center text-lg mb-4 outline-none focus:ring-2 focus:ring-[#00ABE4] text-[#00ABE4] font-bold">
+            <button onclick="saveName()" class="w-full bg-bright text-white font-bold py-3 rounded-xl shadow-lg hover:brightness-110 transition transform active:scale-95">Iniciar</button>
         </div>
+    </div>
+
+    <header class="bg-bright text-white pt-8 pb-12 px-6 rounded-b-[3rem] shadow-lg relative overflow-hidden">
+        <div class="max-w-md mx-auto relative z-10 flex justify-between items-end">
+            <div>
+                <p class="text-blue-100 text-sm font-medium mb-1">Bem-vindo, <span id="userNameDisplay">...</span></p>
+                <h1 class="text-3xl font-bold tracking-tight">Metas 2026</h1>
+                <p class="text-blue-50 text-xs mt-2 opacity-90 max-w-[200px]">"Pequenos avanços diários constroem grandes impérios."</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-inner">
+                <i class="fas fa-flag-checkered text-2xl text-white"></i>
+            </div>
+        </div>
+        <i class="fas fa-rocket absolute -left-4 top-10 text-8xl text-white opacity-10 -rotate-12"></i>
     </header>
 
-    <main class="max-w-md mx-auto p-4 pb-24">
+    <main class="max-w-md mx-auto px-5 -mt-8 relative z-20">
         
-        <div class="bg-white rounded-xl shadow-md p-5 mb-6 border-l-4 border-blue-500">
-            <h2 class="text-lg font-semibold mb-3 text-gray-700">Nova Resolução</h2>
-            <div class="flex gap-2">
-                <input type="text" id="goalInput" placeholder="Ex: Escrever 2 páginas do livro por dia..." 
-                    class="w-full border-gray-300 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                <button onclick="addGoal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition shadow">
-                    <i class="fas fa-plus"></i>
-                </button>
+        <div class="bg-white rounded-[2rem] shadow-lg shadow-blue-100/50 p-5 mb-8 slide-up">
+            <label class="text-xs font-bold text-gray-400 uppercase mb-3 block tracking-wider">Nova Conquista</label>
+            <div class="flex flex-col gap-4">
+                <input type="text" id="goalInput" placeholder="Ex: Escrever Capítulo 1..." 
+                    class="w-full text-lg border-b border-gray-100 pb-2 outline-none focus:border-[#00ABE4] transition-colors text-gray-700 placeholder-gray-300 bg-transparent">
+                
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3 bg-[#E9F1FA] px-4 py-2 rounded-xl">
+                        <button onclick="changeSteps(-1)" class="text-[#00ABE4] w-6 h-6 font-bold text-lg hover:scale-110 transition">-</button>
+                        <div class="text-center w-8">
+                            <span id="stepCountDisplay" class="font-bold text-[#00ABE4] text-lg block leading-none">3</span>
+                            <span class="text-[8px] text-gray-400 uppercase">Etapas</span>
+                        </div>
+                        <button onclick="changeSteps(1)" class="text-[#00ABE4] w-6 h-6 font-bold text-lg hover:scale-110 transition">+</button>
+                    </div>
+
+                    <button onclick="addGoal()" class="bg-bright text-white w-12 h-12 rounded-full shadow-lg hover:scale-105 active:scale-95 transition flex items-center justify-center">
+                        <i class="fas fa-plus text-lg"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
-        <div id="goalsList" class="space-y-3">
-            </div>
+        <div id="goalsList" class="space-y-5"></div>
 
-        <div id="emptyState" class="text-center py-10 hidden">
-            <i class="fas fa-seedling text-4xl text-gray-300 mb-3"></i>
-            <p class="text-gray-500">Nenhuma meta ainda. Que tal começar agora?</p>
+        <div id="emptyState" class="text-center py-12 hidden opacity-60">
+            <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-3"></i>
+            <p class="text-gray-400 font-medium">Sua lista está pronta para ser escrita.</p>
         </div>
     </main>
 
+    <div id="floatContainer" class="fixed inset-0 pointer-events-none z-50"></div>
+
     <script>
-        // 1. Carregar metas salvas
-        let goals = JSON.parse(localStorage.getItem('myGoals')) || [];
+        // --- Frases de Incentivo (Dopamina Visual) ---
+        const INCENTIVES = [
+            "Excelente!", "Avanço confirmado!", "Continue assim!", 
+            "Foco total!", "Mais um passo!", "Isso aí!", "Grande trabalho!"
+        ];
 
-        function renderGoals() {
-            const list = document.getElementById('goalsList');
-            const empty = document.getElementById('emptyState');
-            list.innerHTML = '';
+        // --- Estado do App (LocalStorage) ---
+        let state = {
+            goals: JSON.parse(localStorage.getItem('goals_2026_final')) || [],
+            name: localStorage.getItem('user_name_2026'),
+            tempSteps: 3
+        };
 
-            if (goals.length === 0) {
-                empty.classList.remove('hidden');
+        // --- Inicialização ---
+        function init() {
+            if (!state.name) {
+                document.getElementById('nameModal').classList.remove('hidden');
             } else {
-                empty.classList.add('hidden');
-                goals.forEach((goal, index) => {
-                    const completedClass = goal.done ? 'bg-blue-50 border-blue-200' : 'bg-white';
-                    const textClass = goal.done ? 'line-through text-gray-400' : 'text-gray-800';
-                    const iconClass = goal.done ? 'fa-check-circle text-blue-600' : 'fa-circle text-gray-300';
-
-                    const html = `
-                        <div class="fade-in ${completedClass} p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between transition-all hover:shadow-md">
-                            <div class="flex items-center gap-3 cursor-pointer" onclick="toggleGoal(${index})">
-                                <i class="far ${iconClass} text-xl transition-colors"></i>
-                                <span class="${textClass} font-medium">${goal.text}</span>
-                            </div>
-                            <button onclick="deleteGoal(${index})" class="text-gray-300 hover:text-red-500 transition p-2">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    `;
-                    list.innerHTML += html;
-                });
+                document.getElementById('userNameDisplay').innerText = state.name;
             }
+            render();
+        }
+
+        function saveName() {
+            const val = document.getElementById('nameInput').value.trim();
+            if(val) {
+                state.name = val;
+                localStorage.setItem('user_name_2026', val);
+                document.getElementById('userNameDisplay').innerText = val;
+                document.getElementById('nameModal').classList.add('hidden');
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('goals_2026_final', JSON.stringify(state.goals));
+            render();
+        }
+
+        // --- Lógica de Criação ---
+        function changeSteps(delta) {
+            let n = state.tempSteps + delta;
+            if (n < 1) n = 1;
+            if (n > 50) n = 50;
+            state.tempSteps = n;
+            document.getElementById('stepCountDisplay').innerText = n;
         }
 
         function addGoal() {
             const input = document.getElementById('goalInput');
             const text = input.value.trim();
             if (text) {
-                goals.unshift({ text: text, done: false }); // Adiciona no topo
-                saveAndRender();
+                state.goals.unshift({
+                    text: text,
+                    total: state.tempSteps,
+                    current: 0,
+                    done: false,
+                    id: Date.now()
+                });
+                saveData();
                 input.value = '';
-                input.focus();
+                state.tempSteps = 3;
+                document.getElementById('stepCountDisplay').innerText = 3;
             }
         }
 
-        function toggleGoal(index) {
-            goals[index].done = !goals[index].done;
-            saveAndRender();
+        // --- Lógica de Avanço (A Mágica) ---
+        function advance(index, event) {
+            // event.stopPropagation() impede que cliques no card disparem coisas indesejadas
+            if (event) event.stopPropagation();
+            
+            const goal = state.goals[index];
+            if(goal.done) return;
+
+            goal.current++;
+            
+            // 1. Mostrar Texto Flutuante
+            showFloatingText(event ? event.clientX : null, event ? event.clientY : null);
+
+            // 2. Verificar Conclusão
+            if(goal.current >= goal.total) {
+                goal.done = true;
+                confetti({
+                    particleCount: 150,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#00ABE4', '#E9F1FA']
+                });
+            } else {
+                // Confete menor para avanço parcial
+                confetti({
+                    particleCount: 20,
+                    spread: 40,
+                    startVelocity: 25,
+                    origin: { 
+                        x: (event ? event.clientX : window.innerWidth/2) / window.innerWidth, 
+                        y: (event ? event.clientY : window.innerHeight/2) / window.innerHeight 
+                    },
+                    colors: ['#00ABE4']
+                });
+            }
+            saveData();
         }
 
         function deleteGoal(index) {
-            if(confirm('Deseja remover esta meta da história?')) {
-                goals.splice(index, 1);
-                saveAndRender();
+            if(confirm("Remover esta meta?")) {
+                state.goals.splice(index, 1);
+                saveData();
             }
         }
 
-        function saveAndRender() {
-            localStorage.setItem('myGoals', JSON.stringify(goals));
-            renderGoals();
+        // --- UI Helpers ---
+        function getStatus(current, total) {
+            const pct = (current / total) * 100;
+            if (pct === 0) return { text: "Ponto de Partida", color: "text-gray-400" };
+            if (pct < 35) return { text: "Ganhando Impulso", color: "text-[#00ABE4]" };
+            if (pct < 70) return { text: "Ritmo Forte", color: "text-blue-500" };
+            if (pct < 100) return { text: "Reta Final", color: "text-indigo-500" };
+            return { text: "Conquistado", color: "text-emerald-500 font-bold" };
         }
 
-        // Inicializar
-        renderGoals();
-
-        // 2. Lógica do PWA (Service Worker)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker Registrado'));
-        }
-
-        // Botão de Instalação
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            const btn = document.getElementById('installBtn');
-            btn.classList.remove('hidden');
+        function showFloatingText(x, y) {
+            const container = document.getElementById('floatContainer');
+            const el = document.createElement('div');
+            el.innerText = INCENTIVES[Math.floor(Math.random() * INCENTIVES.length)];
             
-            btn.addEventListener('click', () => {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        btn.classList.add('hidden');
-                    }
-                    deferredPrompt = null;
+            // Posicionamento
+            const finalX = x || window.innerWidth / 2;
+            const finalY = y || window.innerHeight / 2;
+            
+            el.className = "float-text absolute bg-[#00ABE4] text-white font-bold px-4 py-2 rounded-full shadow-xl text-sm z-50 whitespace-nowrap";
+            el.style.left = (finalX - 40) + 'px'; 
+            el.style.top = (finalY - 20) + 'px';
+            
+            container.appendChild(el);
+            setTimeout(() => el.remove(), 1200);
+        }
+
+        // --- Renderização ---
+        function render() {
+            const list = document.getElementById('goalsList');
+            const empty = document.getElementById('emptyState');
+
+            list.innerHTML = '';
+            
+            if (state.goals.length === 0) {
+                empty.classList.remove('hidden');
+            } else {
+                empty.classList.add('hidden');
+                state.goals.sort((a, b) => a.done - b.done);
+
+                state.goals.forEach((goal, index) => {
+                    const pct = Math.min(100, Math.round((goal.current / goal.total) * 100));
+                    const status = getStatus(goal.current, goal.total);
+                    const isDone = goal.done;
+
+                    const item = document.createElement('div');
+                    item.className = `pop-in bg-white rounded-[1.5rem] p-5 shadow-sm border border-transparent transition-all duration-300 relative overflow-hidden ${isDone ? 'opacity-60 grayscale-[0.5] bg-gray-50' : 'hover:shadow-md hover:border-blue-100'}`;
+                    
+                    // Botão Play Dinâmico
+                    const btnHtml = isDone 
+                        ? `<div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-check"></i></div>`
+                        : `<button onclick="advance(${index}, event)" class="w-12 h-12 rounded-full bg-bright text-white shadow-lg shadow-blue-300 flex items-center justify-center active:scale-90 transition group"><i class="fas fa-play ml-1 group-hover:scale-110 transition"></i></button>`;
+
+                    item.innerHTML = `
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="flex-shrink-0">
+                                ${btnHtml}
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="text-gray-700 font-bold text-lg leading-tight truncate pr-2 ${isDone ? 'line-through decoration-gray-300' : ''}">${goal.text}</h3>
+                                    <button onclick="deleteGoal(${index})" class="text-gray-300 hover:text-red-400 p-1"><i class="fas fa-times"></i></button>
+                                </div>
+                                
+                                <div class="flex justify-between items-center text-xs mt-1 mb-2">
+                                    <span class="${status.color} font-semibold uppercase tracking-wider">${status.text}</span>
+                                    <span class="text-gray-400 font-medium bg-[#E9F1FA] px-2 py-0.5 rounded-md">${goal.current}/${goal.total}</span>
+                                </div>
+
+                                <div class="h-3 w-full bg-[#E9F1FA] rounded-full overflow-hidden shadow-inner">
+                                    <div class="h-full bg-bright rounded-full transition-all duration-500 ${!isDone && pct > 0 ? 'progress-striped' : ''}" style="width: ${pct}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(item);
                 });
-            });
-        });
+            }
+        }
+
+        // PWA
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        init();
     </script>
 </body>
 </html>
