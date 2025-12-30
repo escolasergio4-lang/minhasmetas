@@ -8,24 +8,33 @@
     <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        bright: '#00ABE4',
+                        bgLight: '#E9F1FA',
+                        bgDark: '#0f172a', // Slate 900
+                        cardDark: '#1e293b' // Slate 800
+                    }
+                }
+            }
+        }
+    </script>
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* Paleta Definida */
-        :root {
-            --bg-light: #E9F1FA;
-            --blue-bright: #00ABE4;
-            --white: #FFFFFF;
-        }
-
+        /* CSS Base */
         body { 
             font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg-light); 
-            color: #334155; 
             user-select: none;
             overflow-x: hidden;
-            padding-bottom: 120px; /* Espaço extra para o botão flutuante */
+            padding-bottom: 120px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         /* Animações */
@@ -48,11 +57,11 @@
         }
 
         /* Utilitários Visuais */
-        .text-bright { color: var(--blue-bright); }
-        .bg-bright { background-color: var(--blue-bright); }
+        .text-bright { color: #00ABE4; }
+        .bg-bright { background-color: #00ABE4; }
         
         /* Modal Backdrop */
-        #nameModal { backdrop-filter: blur(8px); background-color: rgba(233, 241, 250, 0.8); }
+        #nameModal { backdrop-filter: blur(8px); background-color: rgba(0,0,0, 0.5); }
 
         /* Barra Listrada Animada */
         .progress-striped {
@@ -63,31 +72,35 @@
         @keyframes progress-bar-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
     </style>
 </head>
-<body>
+<body class="bg-bgLight text-slate-700 dark:bg-bgDark dark:text-slate-200">
 
-    <button id="installBtn" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white text-[#00ABE4] px-6 py-4 rounded-full shadow-2xl z-50 font-bold flex items-center gap-3 border border-blue-100 hover:scale-105 transition pulse-soft">
-        <i class="fas fa-download bg-blue-50 p-2 rounded-full"></i> 
+    <button onclick="toggleTheme()" class="fixed top-6 right-6 z-50 bg-white/20 backdrop-blur-md p-3 rounded-full shadow-lg text-white hover:bg-white/30 transition border border-white/20">
+        <i id="themeIcon" class="fas fa-moon text-lg"></i>
+    </button>
+
+    <button id="installBtn" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white dark:bg-cardDark text-bright px-6 py-4 rounded-full shadow-2xl z-50 font-bold flex items-center gap-3 border border-blue-100 dark:border-slate-700 hover:scale-105 transition pulse-soft">
+        <i class="fas fa-download bg-blue-50 dark:bg-slate-900 p-2 rounded-full"></i> 
         <span>Instalar App</span>
     </button>
 
     <div id="nameModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-6">
-        <div class="bg-white rounded-[2rem] shadow-2xl p-8 w-full max-w-sm text-center slide-up border border-[#E9F1FA]">
-            <div class="w-16 h-16 bg-[#E9F1FA] rounded-full flex items-center justify-center mx-auto mb-5">
-                <i class="fas fa-user-astronaut text-[#00ABE4] text-2xl"></i>
+        <div class="bg-white dark:bg-cardDark rounded-[2rem] shadow-2xl p-8 w-full max-w-sm text-center slide-up border border-[#E9F1FA] dark:border-slate-600">
+            <div class="w-16 h-16 bg-[#E9F1FA] dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-5">
+                <i class="fas fa-user-astronaut text-bright text-2xl"></i>
             </div>
-            <h2 class="text-2xl font-bold text-gray-700 mb-2">Jornada 2026</h2>
-            <p class="text-gray-400 mb-6">Quem é o autor desta história?</p>
-            <input type="text" id="nameInput" placeholder="Seu nome" class="w-full bg-[#E9F1FA] rounded-xl px-4 py-3 text-center text-lg mb-4 outline-none focus:ring-2 focus:ring-[#00ABE4] text-[#00ABE4] font-bold">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">Jornada 2026</h2>
+            <p class="text-gray-500 dark:text-gray-300 mb-6 font-medium">Quem é o autor desta história?</p>
+            <input type="text" id="nameInput" placeholder="Seu nome" class="w-full bg-[#E9F1FA] dark:bg-slate-900 dark:text-white rounded-xl px-4 py-3 text-center text-lg mb-4 outline-none focus:ring-2 focus:ring-[#00ABE4] text-bright font-bold placeholder-gray-400">
             <button onclick="saveName()" class="w-full bg-bright text-white font-bold py-3 rounded-xl shadow-lg hover:brightness-110 transition transform active:scale-95">Iniciar</button>
         </div>
     </div>
 
-    <header class="bg-bright text-white pt-8 pb-12 px-6 rounded-b-[3rem] shadow-lg relative overflow-hidden">
+    <header class="bg-bright text-white pt-8 pb-12 px-6 rounded-b-[3rem] shadow-lg relative overflow-hidden transition-colors">
         <div class="max-w-md mx-auto relative z-10 flex justify-between items-end">
             <div>
                 <p class="text-blue-100 text-sm font-medium mb-1">Bem-vindo, <span id="userNameDisplay">...</span></p>
                 <h1 class="text-3xl font-bold tracking-tight">Metas 2026</h1>
-                <p class="text-blue-50 text-xs mt-2 opacity-70 max-w-[200px]">"Pequenos avanços diários constroem grandes impérios."</p>
+                <p class="text-blue-50 text-xs mt-2 opacity-90 max-w-[200px]">"Pequenos avanços diários constroem grandes impérios."</p>
             </div>
             <div class="bg-white/20 backdrop-blur-md p-3 rounded-2xl border border-white/10 shadow-inner">
                 <i class="fas fa-flag-checkered text-2xl text-white"></i>
@@ -98,20 +111,20 @@
 
     <main class="max-w-md mx-auto px-5 -mt-8 relative z-20">
         
-        <div class="bg-white rounded-[2rem] shadow-lg shadow-blue-100/50 p-5 mb-8 slide-up">
-            <label class="text-xs font-bold text-gray-400 uppercase mb-3 block tracking-wider">Nova Conquista</label>
+        <div class="bg-white dark:bg-cardDark rounded-[2rem] shadow-lg shadow-blue-100/50 dark:shadow-black/30 p-5 mb-8 slide-up transition-colors">
+            <label class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase mb-3 block tracking-wider">Nova Conquista</label>
             <div class="flex flex-col gap-4">
                 <input type="text" id="goalInput" placeholder="Ex: Escrever Capítulo 1..." 
-                    class="w-full text-lg border-b border-gray-100 pb-2 outline-none focus:border-[#00ABE4] transition-colors text-gray-700 placeholder-gray-300 bg-transparent">
+                    class="w-full text-lg border-b border-gray-200 dark:border-slate-600 pb-2 outline-none focus:border-[#00ABE4] transition-colors text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 bg-transparent font-medium">
                 
                 <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-3 bg-[#E9F1FA] px-4 py-2 rounded-xl">
-                        <button onclick="changeSteps(-1)" class="text-[#00ABE4] w-6 h-6 font-bold text-lg hover:scale-110 transition">-</button>
+                    <div class="flex items-center gap-3 bg-[#E9F1FA] dark:bg-slate-900 px-4 py-2 rounded-xl transition-colors">
+                        <button onclick="changeSteps(-1)" class="text-bright w-6 h-6 font-bold text-lg hover:scale-110 transition">-</button>
                         <div class="text-center w-8">
-                            <span id="stepCountDisplay" class="font-bold text-[#00ABE4] text-lg block leading-none">3</span>
-                            <span class="text-[8px] text-gray-400 uppercase">Etapas</span>
+                            <span id="stepCountDisplay" class="font-bold text-bright text-lg block leading-none">3</span>
+                            <span class="text-[9px] text-gray-500 dark:text-gray-400 uppercase font-bold">Etapas</span>
                         </div>
-                        <button onclick="changeSteps(1)" class="text-[#00ABE4] w-6 h-6 font-bold text-lg hover:scale-110 transition">+</button>
+                        <button onclick="changeSteps(1)" class="text-bright w-6 h-6 font-bold text-lg hover:scale-110 transition">+</button>
                     </div>
 
                     <button onclick="addGoal()" class="bg-bright text-white w-12 h-12 rounded-full shadow-lg hover:scale-105 active:scale-95 transition flex items-center justify-center">
@@ -123,28 +136,51 @@
 
         <div id="goalsList" class="space-y-5"></div>
 
-        <div id="emptyState" class="text-center py-12 hidden opacity-60">
-            <i class="fas fa-clipboard-list text-4xl text-gray-300 mb-3"></i>
-            <p class="text-gray-400 font-medium">Sua lista está pronta para ser escrita.</p>
+        <div id="emptyState" class="text-center py-12 hidden opacity-70">
+            <i class="fas fa-clipboard-list text-4xl text-gray-400 dark:text-slate-600 mb-3"></i>
+            <p class="text-gray-500 dark:text-slate-500 font-medium">Sua lista está pronta para ser escrita.</p>
         </div>
     </main>
-<footer class="text-center py-8 mt-auto relative z-10">
-    <p class="text-gray-400 text-xs">
-        Desenvolvido pelo <span class="text-[#00ABE4] font-bold">Profº Sérgio Araújo</span> &copy; 2026
-    </p>
-</footer>
+
+    <footer class="text-center py-8 mt-auto relative z-10">
+        <p class="text-gray-500 dark:text-gray-400 text-xs font-medium">
+            Desenvolvido pelo <span class="text-bright font-bold">Profº Sérgio Araújo</span> &copy; 2026
+        </p>
+    </footer>
+
     <div id="floatContainer" class="fixed inset-0 pointer-events-none z-50"></div>
 
     <script>
-        // --- Lógica de Instalação (PWA) ---
+        // --- Lógica de Tema (Dark/Light) ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const icon = document.getElementById('themeIcon');
+            
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                icon.className = 'fas fa-moon text-lg';
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                icon.className = 'fas fa-sun text-lg';
+            }
+        }
+
+        // Carregar tema salvo
+        if (localStorage.getItem('theme') === 'dark' || 
+           (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            document.getElementById('themeIcon').className = 'fas fa-sun text-lg';
+        }
+
+        // --- Instalação PWA ---
         let deferredPrompt;
         const installBtn = document.getElementById('installBtn');
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Impede o Chrome de mostrar a barra nativa automaticamente
             e.preventDefault();
             deferredPrompt = e;
-            // Mostra o nosso botão bonito
             installBtn.classList.remove('hidden');
         });
 
@@ -159,20 +195,18 @@
             }
         });
 
-        // --- Frases de Incentivo ---
+        // --- Estado e Lógica ---
         const INCENTIVES = [
             "Excelente!", "Avanço confirmado!", "Continue assim!", 
             "Foco total!", "Mais um passo!", "Isso aí!", "Grande trabalho!"
         ];
 
-        // --- Estado do App (LocalStorage) ---
         let state = {
             goals: JSON.parse(localStorage.getItem('goals_2026_final')) || [],
             name: localStorage.getItem('user_name_2026'),
             tempSteps: 3
         };
 
-        // --- Inicialização ---
         function init() {
             if (!state.name) {
                 document.getElementById('nameModal').classList.remove('hidden');
@@ -197,7 +231,6 @@
             render();
         }
 
-        // --- Lógica de Criação ---
         function changeSteps(delta) {
             let n = state.tempSteps + delta;
             if (n < 1) n = 1;
@@ -224,30 +257,23 @@
             }
         }
 
-        // --- Lógica de Avanço ---
         function advance(index, event) {
             if (event) event.stopPropagation();
-            
             const goal = state.goals[index];
             if(goal.done) return;
 
             goal.current++;
-            
             showFloatingText(event ? event.clientX : null, event ? event.clientY : null);
 
             if(goal.current >= goal.total) {
                 goal.done = true;
                 confetti({
-                    particleCount: 150,
-                    spread: 80,
-                    origin: { y: 0.6 },
+                    particleCount: 150, spread: 80, origin: { y: 0.6 },
                     colors: ['#00ABE4', '#E9F1FA']
                 });
             } else {
                 confetti({
-                    particleCount: 20,
-                    spread: 40,
-                    startVelocity: 25,
+                    particleCount: 20, spread: 40, startVelocity: 25,
                     origin: { 
                         x: (event ? event.clientX : window.innerWidth/2) / window.innerWidth, 
                         y: (event ? event.clientY : window.innerHeight/2) / window.innerHeight 
@@ -265,33 +291,28 @@
             }
         }
 
-        // --- UI Helpers ---
         function getStatus(current, total) {
             const pct = (current / total) * 100;
-            if (pct === 0) return { text: "Ponto de Partida", color: "text-gray-400" };
+            // Cores ajustadas para Dark Mode também
+            if (pct === 0) return { text: "Ponto de Partida", color: "text-gray-500 dark:text-gray-400" };
             if (pct < 35) return { text: "Ganhando Impulso", color: "text-[#00ABE4]" };
-            if (pct < 70) return { text: "Ritmo Forte", color: "text-blue-500" };
-            if (pct < 100) return { text: "Reta Final", color: "text-indigo-500" };
-            return { text: "Conquistado", color: "text-emerald-500 font-bold" };
+            if (pct < 70) return { text: "Ritmo Forte", color: "text-blue-600 dark:text-blue-400" };
+            if (pct < 100) return { text: "Reta Final", color: "text-indigo-600 dark:text-indigo-400" };
+            return { text: "Conquistado", color: "text-emerald-600 dark:text-emerald-400 font-bold" };
         }
 
         function showFloatingText(x, y) {
             const container = document.getElementById('floatContainer');
             const el = document.createElement('div');
             el.innerText = INCENTIVES[Math.floor(Math.random() * INCENTIVES.length)];
-            
             const finalX = x || window.innerWidth / 2;
             const finalY = y || window.innerHeight / 2;
-            
             el.className = "float-text absolute bg-[#00ABE4] text-white font-bold px-4 py-2 rounded-full shadow-xl text-sm z-50 whitespace-nowrap";
-            el.style.left = (finalX - 40) + 'px'; 
-            el.style.top = (finalY - 20) + 'px';
-            
+            el.style.left = (finalX - 40) + 'px'; el.style.top = (finalY - 20) + 'px';
             container.appendChild(el);
             setTimeout(() => el.remove(), 1200);
         }
 
-        // --- Renderização ---
         function render() {
             const list = document.getElementById('goalsList');
             const empty = document.getElementById('emptyState');
@@ -310,11 +331,12 @@
                     const isDone = goal.done;
 
                     const item = document.createElement('div');
-                    item.className = `pop-in bg-white rounded-[1.5rem] p-5 shadow-sm border border-transparent transition-all duration-300 relative overflow-hidden ${isDone ? 'opacity-60 grayscale-[0.5] bg-gray-50' : 'hover:shadow-md hover:border-blue-100'}`;
+                    // Classes dinâmicas para Dark Mode nos cards
+                    item.className = `pop-in bg-white dark:bg-cardDark rounded-[1.5rem] p-5 shadow-sm dark:shadow-black/20 border border-transparent transition-all duration-300 relative overflow-hidden ${isDone ? 'opacity-60 grayscale-[0.5] bg-gray-100 dark:bg-slate-900' : 'hover:shadow-md hover:border-blue-100 dark:hover:border-slate-600'}`;
                     
                     const btnHtml = isDone 
-                        ? `<div class="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-check"></i></div>`
-                        : `<button onclick="advance(${index}, event)" class="w-12 h-12 rounded-full bg-bright text-white shadow-lg shadow-blue-300 flex items-center justify-center active:scale-90 transition group"><i class="fas fa-play ml-1 group-hover:scale-110 transition"></i></button>`;
+                        ? `<div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl shadow-inner"><i class="fas fa-check"></i></div>`
+                        : `<button onclick="advance(${index}, event)" class="w-12 h-12 rounded-full bg-bright text-white shadow-lg shadow-blue-300 dark:shadow-none flex items-center justify-center active:scale-90 transition group"><i class="fas fa-play ml-1 group-hover:scale-110 transition"></i></button>`;
 
                     item.innerHTML = `
                         <div class="flex items-center gap-4 relative z-10">
@@ -323,14 +345,14 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start">
-                                    <h3 class="text-gray-700 font-bold text-lg leading-tight truncate pr-2 ${isDone ? 'line-through decoration-gray-300' : ''}">${goal.text}</h3>
-                                    <button onclick="deleteGoal(${index})" class="text-gray-300 hover:text-red-400 p-1"><i class="fas fa-times"></i></button>
+                                    <h3 class="text-gray-800 dark:text-white font-bold text-lg leading-tight truncate pr-2 ${isDone ? 'line-through decoration-gray-400 text-gray-500 dark:text-gray-500' : ''}">${goal.text}</h3>
+                                    <button onclick="deleteGoal(${index})" class="text-gray-400 dark:text-slate-500 hover:text-red-500 p-1"><i class="fas fa-times"></i></button>
                                 </div>
                                 <div class="flex justify-between items-center text-xs mt-1 mb-2">
                                     <span class="${status.color} font-semibold uppercase tracking-wider">${status.text}</span>
-                                    <span class="text-gray-400 font-medium bg-[#E9F1FA] px-2 py-0.5 rounded-md">${goal.current}/${goal.total}</span>
+                                    <span class="text-gray-600 dark:text-gray-300 font-medium bg-[#E9F1FA] dark:bg-slate-700 px-2 py-0.5 rounded-md">${goal.current}/${goal.total}</span>
                                 </div>
-                                <div class="h-3 w-full bg-[#E9F1FA] rounded-full overflow-hidden shadow-inner">
+                                <div class="h-3 w-full bg-[#E9F1FA] dark:bg-slate-700 rounded-full overflow-hidden shadow-inner">
                                     <div class="h-full bg-bright rounded-full transition-all duration-500 ${!isDone && pct > 0 ? 'progress-striped' : ''}" style="width: ${pct}%"></div>
                                 </div>
                             </div>
@@ -341,7 +363,6 @@
             }
         }
 
-        // PWA (Service Worker)
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
         init();
     </script>
